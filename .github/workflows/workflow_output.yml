@@ -10,7 +10,7 @@ jobs:
 
     steps:
     - name: Log event details
-      run: echo "Event details: ${{ toJson(github.event) }}"
+      run: echo "Event details ${{ toJson(github.event) }}"
 
     - name: Create issue comment
       uses: peter-evans/create-issue-comment@v2
