@@ -1,23 +1,30 @@
-name: Issue Event Details
+name: Check Workflow Status
 
 on:
-  issues:
-    types: [opened, edited, closed]
+  workflow_run:
+    workflows: ["Lint, Test, and Deploy"]
+    types:
+      - completed
 
 jobs:
-  log-event-details:
+  post-status:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Log event details
-      run: echo "Event details ${{ toJson(github.event) }}"
+    - name: Check out repository
+      uses: actions/checkout@v2
 
-    - name: Create issue comment
+    - name: Get workflow status
+      id: get_status
+      run: echo "status=${{ github.event.workflow_run.conclusion }}" >> $GITHUB_ENV
+
+    - name: Post status to issue
+      if: ${{ github.event.workflow_run.conclusion == 'success' || github.event.workflow_run.conclusion == 'failure' }}
       uses: peter-evans/create-issue-comment@v2
       with:
-        issue-number: ${{ github.event.issue.number }}
+        issue-number: ${{ github.event.workflow_run.head_commit.message }}
         body: |
-          **Event Type:** ${{ github.event.action }}
-          **Issue Title:** ${{ github.event.issue.title }}
-          **Issue Body:** ${{ github.event.issue.body }}
-          **Event Details:** ${{ toJson(github.event) }}
+          **Workflow Name:** ${{ github.event.workflow_run.name }}
+          **Status:** ${{ github.event.workflow_run.conclusion }}
+          **Run ID:** ${{ github.event.workflow_run.id }}
+          **Run URL:** ${{ github.event.workflow_run.html_url }}
