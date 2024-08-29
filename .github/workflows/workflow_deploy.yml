@@ -45,6 +45,6 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
       - name: Deploy to production
-        run: |
+        run: 
           # Add your deployment commands here
           echo "Deploying to production..."
