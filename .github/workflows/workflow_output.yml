@@ -1,0 +1,23 @@
+name: Issue Event Details
+
+on:
+  issues:
+    types: [opened, edited, closed]
+
+jobs:
+  log-event-details:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Log event details
+      run: echo "Event details: ${{ toJson(github.event) }}"
+
+    - name: Create issue comment
+      uses: peter-evans/create-issue-comment@v2
+      with:
+        issue-number: ${{ github.event.issue.number }}
+        body: |
+          **Event Type:** ${{ github.event.action }}
+          **Issue Title:** ${{ github.event.issue.title }}
+          **Issue Body:** ${{ github.event.issue.body }}
+          **Event Details:** ${{ toJson(github.event) }}
